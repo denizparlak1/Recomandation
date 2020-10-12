@@ -121,7 +121,24 @@ als = ALS(userCol='id',
           rank=4,
           seed=42)
 
+als_paramgrid = (ParamGridBuilder()
+                 .addGrid(als.rank, [2, 4])
+                 .addGrid(als.maxIter, [10])
+                 .addGrid(als.regParam, [0.1])
+                 .addGrid(als.alpha, [2.0, 3.0])
+                 .build())
 
+# The evaluation function for determining the best model
+rmse_eval = RegressionEvaluator(labelCol='rating',
+                                predictionCol='prediction', 
+                                metricName='rmse')
+
+# The cross validation instance
+als_cv = CrossValidator(estimator=als,
+                        estimatorParamMaps=als_paramgrid,
+                        evaluator=rmse_eval,
+                        numFolds=3, 
+                        seed=42)
 
 
 # function to select a few rows of data and convert to a Pandas dataframe
